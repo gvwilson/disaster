@@ -60,7 +60,7 @@ written by people who have a dozen other things to do.
     -   A team member leaves suddenly and takes the only knowledge of something with them
     -   A SaaS provider locks you out or goes out of business
     -   A ransomware attack encrypts your shared files
-    -   A mistaken `DROP TABLE` or `rm -rf` wipes something important
+    -   A mistaken \texttt{DROP TABLE} or \texttt{rm -rf} wipes something important
 -   Revisit this list whenever there's a new dependency,
     a new team member,
     or a new project.
@@ -91,9 +91,9 @@ written by people who have a dozen other things to do.
     you have a bus-factor problem:
     fix it *before* you need the checklist.
     For example:
-    1. Send a message to #incidents in Slack.
+    1. Send a message to \texttt{\#incidents} in Slack.
     2. SSH into the database host.
-    3. Run `./restore-db.sh prod 2026-07-25`.
+    3. Run \texttt{./restore-db.sh prod 2026-07-25}.
     4. Verify the health-check endpoint returns 200.
 -   Store the plan in at least two places that cannot fail simultaneously,
     e.g.,
@@ -415,13 +415,14 @@ written by people who have a dozen other things to do.
     and that every phone number still rings the right phone.
 -   Verify that the backup scripts are running
     by actually checking the backup bucket for recent files.
-    A "success" email from a task that has been writing to `/dev/null` for a month
+    A "success" email from a task that has been writing to \texttt{/dev/null} for a month
     is worse than a failure email.
     (Go ahead, ask me how I know…)
 -   Ask the person who joined the team most recently to find the recovery document
     and explain the first three steps.
     If it takes more than two minutes, make it easier to find.
 
-\bibliography{10-safety}
+\nocite{*}
+\bibliography{disaster-tips}
 
 \end{document}
