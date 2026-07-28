@@ -1,26 +1,23 @@
+%% The plos2025.bst file is intended for use in PLOS submissions.
+%% It is a copy of the Vancouver BibTeX style (https://ctan.org/pkg/vancouver)
+%% with "eprints", "doi", and "hyperref" enabled (see init.config.constants below).
 %%
-%% 
 %%
-%%
-%% This `plos2015.bst' file is intended for use in PLOS submissions to 
-%% correctly compile the bibliography according to the PLOS manuscript 
-%% guidelines updated January 2015.
-%% 
-%%
-%% This is derived from the `vancouver.bst' bibliographic style file (for 
-%% LaTeX/BibTeX), generated with the docstrip utility and modified manually
-%% to meet the
+%% This `vancouver.bst' bibliographic style file (for LaTeX/BibTeX) is
+%% generated with the docstrip utility and modified manually to meet the
 %% ``Uniform Requirements for Manuscripts Submitted to Biomedical Journals''
 %% as published in N Engl J Med 1997;336:309-315.
 %% (also known as the Vancouver style)
-%% This specification may be found on the web page of the
-%% International Committe of Medical Journal Editors:
-%%
-%% http://www.icmje.org
+%% The standards are summarized in:
+%% https://www.nlm.nih.gov/bsd/uniform_requirements.html
+%% and detailed in:
+%% https://www.ncbi.nlm.nih.gov/books/NBK7256/
 %%
 %%-------------------------------------------------------------------
 %%
-%% Copyright 2004  Folkert van der Beek
+%% Author: Folkert van der Beek <folkertvanderbeek@gmail.com>
+%% Version: 1.0
+%% URL: https://gitlab.com/fvdbeek/vancouver.bst
 %%
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3
@@ -29,14 +26,6 @@
 %%   http://www.latex-project.org/lppl.txt
 %% and version 1.3 or later is part of all distributions of LaTeX
 %% version 2005/12/01 or later.
-%%
-%% This work has the LPPL maintenance status `maintained'.
-%% 
-%% The Current Maintainer of this work is Folkert van der Beek.
-%%
-%% Complaints, suggestions and comments may be sent to
-%%
-%% Folkert van der Beek <folkertvanderbeek at gmail dot com>
 %%
 %%-------------------------------------------------------------------
 %%
@@ -100,18 +89,21 @@ ENTRY
   { label }
 %% Declaration of integer variables
 INTEGERS { output.state before.all mid.sentence after.sentence after.block }
-STRINGS { urlintro doiprefix } % urlbst...
+STRINGS { urlintro eprinturl eprintprefix doiprefix doiurl } % urlbst...
 INTEGERS { hrefform addeprints adddoiresolver }
 % Following constants may be adjusted by hand, if desired
 FUNCTION {init.config.constants}
 {
   "Available from: " 'urlintro := % prefix before URL
+  "http://arxiv.org/abs/" 'eprinturl := % prefix to make URL from eprint ref
+  "arXiv:" 'eprintprefix := % text prefix printed before eprint ref
+  "http://dx.doi.org/" 'doiurl := % prefix to make URL from DOI
   "doi:" 'doiprefix := % text prefix printed before DOI ref
-  #0 'addeprints := % 0=no eprints; 1=include eprints
-  #0 'adddoiresolver := % 0=no DOI resolver; 1=include it
-  #0 'hrefform := % 0=no crossrefs; 1=hypertex xrefs; 2=hyperref refs
+  #1 'addeprints := % 0=no eprints; 1=include eprints
+  #1 'adddoiresolver := % 0=no DOI resolver; 1=include it
+  #2 'hrefform := % 0=no crossrefs; 1=hypertex xrefs; 2=hyperref refs
 }
-INTEGERS { 
+INTEGERS {
   bracket.state
   outside.brackets
   open.brackets
@@ -182,14 +174,14 @@ FUNCTION {output.nonnull}
       bracket.state open.brackets =
         { " [" * }
         { ", " * } % bracket.state will be within.brackets
-      if$ 
-      s * 
+      if$
+      s *
       close.brackets 'bracket.state :=
     }
   if$
 }
 
-% Call this function just before adding something which should be presented in 
+% Call this function just before adding something which should be presented in
 % brackets.  bracket.state is handled specially within output.nonnull.
 FUNCTION {inbrackets}
 { bracket.state close.brackets =
@@ -226,7 +218,7 @@ FUNCTION {output.check}
 }
 
 FUNCTION {fin.entry}
-{ 
+{
   bracket.state close.brackets = % urlbst
     { "]" * }
     'skip$
@@ -265,6 +257,12 @@ FUNCTION {no.blank.or.punct}
 FUNCTION {add.semicolon}
 {
   ";" *
+  no.blank.or.punct
+}
+
+FUNCTION {add.colon}
+{
+  ":" *
   no.blank.or.punct
 }
 
@@ -440,7 +438,7 @@ FUNCTION {remove.dots}
       * % concatenates the last 2 literals, i.e. every character, even a dot, following a "\" will be printed
     }
     { duplicate$ "." = % pushes 1 if the last character is ".", otherwise 0
-      'pop$ %  pushes the pop$ function 
+      'pop$ %  pushes the pop$ function
       { * } % concatenates the last 2 literals
     if$ % pops the last character if it is a dot, otherwise concatenates it with the string on top of the stack
     }
@@ -462,7 +460,7 @@ FUNCTION{string.length}
 STRINGS {replace find text}
 INTEGERS {find_length}
 FUNCTION {find.replace}
-{ 
+{
   'replace :=
   'find :=
   'text :=
@@ -594,10 +592,10 @@ FUNCTION {bbl.in}
 { "in" }
 
 FUNCTION {bbl.pages}
-{ " p." }
+{ "p." }
 
 FUNCTION {bbl.page}
-{ " p." }
+{ "p." }
 
 FUNCTION {bbl.chapter}
 { "chap." }
@@ -823,7 +821,7 @@ FUNCTION {format.names.ed}
 }
 
 FUNCTION {format.authors}
-{ 
+{
   author "author" format.names
   %%"." " " "author" find.replace format.names
 }
@@ -923,7 +921,6 @@ FUNCTION {format.type}
   if$
 }
 
-
 FUNCTION {output.bibitem}
 { outside.brackets 'bracket.state := % urlbst
    newline$
@@ -935,23 +932,15 @@ FUNCTION {output.bibitem}
   before.all 'output.state :=
 }
 
-FUNCTION {n.dashify}
-{
-  't :=
+FUNCTION {hyphenate}
+{ 't :=
   ""
     { t empty$ not }
     { t #1 #1 substring$ "-" =
-        { t #1 #2 substring$ "--" = not
-            { "--" *
-              t #2 global.max$ substring$ 't :=
-            }
-            {   { t #1 #1 substring$ "-" = }
-                { "-" *
-                  t #2 global.max$ substring$ 't :=
-                }
-              while$
-            }
-          if$
+        { "-" *
+            { t #1 #1 substring$ "-" = }
+            { t #2 global.max$ substring$ 't := }
+          while$
         }
         { t #1 #1 substring$ *
           t #2 global.max$ substring$ 't :=
@@ -968,7 +957,7 @@ FUNCTION {word.in}
 
 FUNCTION {format.journal.date}
 {
-  ""
+  month "month" bibinfo.check
   duplicate$ empty$
   year  "year"  bibinfo.check duplicate$ empty$
     {
@@ -998,7 +987,7 @@ FUNCTION {format.journal.date}
 FUNCTION {format.date}
 {
   no.blank.or.punct
-  ";" 
+  ";"
   duplicate$ empty$
   year  "year"  bibinfo.check duplicate$ empty$
     { swap$ 'skip$
@@ -1156,12 +1145,136 @@ FUNCTION {multi.page.check}
   multiresult
 }
 
+FUNCTION {is.letter}
+{ duplicate$ empty$
+    { pop$ #0 }
+    { chr.to.int$
+      duplicate$ "A" chr.to.int$ <
+        { pop$ #0 }
+        { duplicate$ "Z" chr.to.int$ >
+            { duplicate$ "a" chr.to.int$ <
+                { pop$ #0 }
+                { duplicate$ "z" chr.to.int$ >
+                    { pop$ #0 }
+                    { pop$ #1 }
+                  if$
+                }
+              if$
+            }
+            { pop$ #1 }
+          if$
+        }
+      if$
+    }
+  if$
+}
+
+FUNCTION {is.digit}
+{ duplicate$ empty$
+    { pop$ #0 }
+    { chr.to.int$
+      duplicate$ "0" chr.to.int$ <
+        { pop$ #0 }
+        { "9" chr.to.int$ >
+            { #0 }
+            { #1 }
+          if$
+        }
+      if$
+    }
+  if$
+}
+
+FUNCTION {is.letter.digit}
+{ duplicate$ is.letter
+  swap$ is.digit or
+}
+
+INTEGERS { charptr len }
+
+STRINGS { start.number end.number range.separator }
+
+FUNCTION {abbreviate.range.numbers}
+{ end.number end.number text.length$ #1 substring$ is.letter
+    { start.number range.separator * end.number * }
+    { end.number text.length$ 'len :=
+      start.number text.length$ len <
+        'skip$
+        { start.number text.length$ len - #1 + 'charptr :=
+            { end.number text.length$ #1 >
+              start.number charptr #1 substring$
+              end.number #1 #1 substring$ = and
+            }
+            { charptr #1 + 'charptr :=
+              end.number #2 global.max$ substring$ 'end.number :=
+            }
+          while$
+        }
+      if$
+      start.number range.separator * end.number *
+    }
+  if$
+}
+
+% This a helper function for use in format.page.numbers
+FUNCTION {append.pages.part}
+{ duplicate$ duplicate$ text.length$ #1 substring$ "," =
+    { " " * }
+    'skip$
+  if$
+  end.number empty$
+    { start.number empty$
+        'skip$
+        { start.number * }
+      if$
+    }
+    { abbreviate.range.numbers * }
+  if$
+  "" 'start.number :=
+  "" 'end.number :=
+  "" 'range.separator :=
+}
+
+FUNCTION {format.page.numbers}
+{ 's :=
+  "" 't :=
+  "" 'start.number :=
+  "" 'end.number :=
+  "" 'range.separator :=
+  ""
+    { s empty$ not }
+    { s #1 #1 substring$ 't :=
+      t is.letter.digit
+        { range.separator empty$
+            { start.number t * 'start.number := }
+            { end.number t * 'end.number := }
+          if$
+        }
+        { s #1 #2 substring$ "--" =
+            { "--" 'range.separator := }
+            { t "-" =
+                { "-" 'range.separator := }
+                { append.pages.part
+                  t *
+                }
+              if$
+            }
+          if$
+        }
+      if$
+      s #2 global.max$ substring$ 's :=
+    }
+  while$
+  append.pages.part
+}
+
 FUNCTION {format.pages}
 { pages duplicate$ empty$ 'skip$
     { duplicate$ multi.page.check
         {
+          format.page.numbers
           bbl.pages swap$
-          n.dashify
+          hyphenate
         }
         {
           bbl.page swap$
@@ -1175,18 +1288,16 @@ FUNCTION {format.pages}
 }
 
 FUNCTION {format.journal.pages}
-{ pages duplicate$ empty$ 'pop$
-    { swap$ duplicate$ empty$
-        { pop$ pop$ format.pages }
-        {
-          ":" *
-          swap$
-          n.dashify
-          "pages" bibinfo.check
-          *
-        }
-      if$
-    }
+{ pages empty$ 'skip$
+  { add.colon }
+  if$
+  pages duplicate$ empty$ 'pop$
+  {
+    format.page.numbers
+    hyphenate
+    "pages" bibinfo.check
+    *
+  }
   if$
 }
 
@@ -1210,7 +1321,11 @@ FUNCTION {format.vol.num}
 }
 
 FUNCTION {format.vol.num.pages}
-{ volume field.or.null
+{ volume empty$ number empty$ and
+    'skip$
+    { add.semicolon }
+  if$
+  volume field.or.null
   duplicate$ empty$ 'skip$
     {
       "volume" bibinfo.check
@@ -1350,6 +1465,10 @@ FUNCTION {format.institution.address}
 { institution "institution" bibinfo.check format.org.or.pub
 }
 
+FUNCTION {format.school.address}
+{ school "school" bibinfo.check format.org.or.pub
+}
+
 
 % urlbst...
 % Functions for making hypertext links.
@@ -1362,14 +1481,14 @@ FUNCTION {make.href.null}
 }
 % make hypertex specials
 FUNCTION {make.href.hypertex}
-{ 
+{
   "\special {html:<a href=" quote$ *
   swap$ * quote$ * "> }" * swap$ *
   "\special {html:</a>}" *
 }
 % make hyperref specials
 FUNCTION {make.href.hyperref}
-{ 
+{
   "\href {" swap$ * "} {" * swap$ * "}" *
 }
 FUNCTION {make.href}
@@ -1395,20 +1514,17 @@ FUNCTION {format.url}
   if$
 }
 
-%FUNCTION {format.eprint}
-%{ eprint empty$
-%    { "" }
-%    { eprintprefix eprint * eprinturl eprint * make.href }
-%  if$
-%}
+FUNCTION {format.eprint}
+{ eprint empty$
+    { "" }
+    { eprintprefix eprint * eprinturl eprint * make.href }
+  if$
+}
 
 FUNCTION {format.doi}
 { doi empty$
     { "" }
-    {
-      new.block
-      "doi:{" doi * "}" *
-    }
+    { doiprefix doi * doiurl doi * make.href }
   if$
 }
 
@@ -1419,26 +1535,26 @@ FUNCTION {format.doi}
 % the URL and the lastchecked in brackets.
 FUNCTION {output.url}
 { url empty$
-    'skip$ 
-      { new.block 
+    'skip$
+    { new.block
       format.url output
-      format.lastchecked output 
-      }
+      format.lastchecked output
+    }
   if$
 }
 
-%FUNCTION {output.web.refs}
-%{
-%  new.block
-%  output.url
-%  addeprints eprint empty$ not and
-%    { format.eprint output.nonnull }
-%    'skip$
-%  if$
-%  adddoiresolver doi empty$ not and
-%    { format.doi output.nonnull }
-%    'skip$
-%  if$
+FUNCTION {output.web.refs}
+{
+  new.block
+  output.url
+  addeprints eprint empty$ not and
+    { format.eprint output.nonnull }
+    'skip$
+  if$
+  adddoiresolver doi empty$ not and
+    { format.doi output.nonnull }
+    'skip$
+  if$
 %  addeprints
 %    { eprint empty$
 %        'skip$
@@ -1447,9 +1563,7 @@ FUNCTION {output.url}
 %    }
 %    'skip$
 %  if$
-%}
-
-
+}
 
 % Webpage entry type.
 % Title and url fields required;
@@ -1477,7 +1591,7 @@ FUNCTION {webpage}
   format.title "title" output.check
   journal empty$
     {
-      format.type "type"
+      format.type "type" output.check
       publisher empty$
         'skip$
         { format.publisher.address output }
@@ -1505,7 +1619,7 @@ FUNCTION {webpage}
       remove.dots
       "journal" bibinfo.check
       "journal" output.check
-      format.type "type"
+      format.type "type" output.check
       format.journal.date "year" output.check
       lastchecked empty$
         'skip$
@@ -1533,22 +1647,21 @@ FUNCTION {webpage}
 FUNCTION {misc}
 { output.bibitem
   format.authors "author" output.check
-%  format.editors "author and editor" output.check
+  format.editors "author and editor" output.check
   format.title "title" output.check
   type missing$
     { skip$ }
-    { format.type "type" }
+    { format.type "type" output.check }
     %%{ inbrackets type output }
   if$
-  new.block
-%  format.publisher.address output
+  format.publisher.address output
   format.date "year" output.check
   new.block
-%  format.note output
+  format.note output
   new.block
   howpublished new.block.checka
   howpublished "howpublished" bibinfo.check output
-  output.url % urlbst
+  output.web.refs  % urlbst
   fin.entry
   empty.misc.check
 }
@@ -1572,19 +1685,20 @@ FUNCTION {article}
   if$
   new.block
   format.title "title" output.check
+  type missing$
+    { skip$ }
+    { format.type "type" output.check }
+  if$
   new.block
   journal
   remove.dots
   "journal" bibinfo.check
   "journal" output.check
   format.journal.date "year" output.check
-  add.semicolon
   format.vol.num.pages output
   new.block
-  format.doi output
-  new.block
-%  format.note output
-%  output.url  % urlbst
+  format.note output
+  output.web.refs  % urlbst
   fin.entry
 }
 
@@ -1595,7 +1709,7 @@ FUNCTION {book}
         { format.organizations "organization" output.check }
         { format.editors "author and editor" output.check }
       if$
-    } 
+    }
     { format.authors output.nonnull
       "author and editor" editor either.or.check
     }
@@ -1616,8 +1730,8 @@ FUNCTION {book}
   format.publisher.address output
   format.date "year" output.check
   new.block
-%  format.note output
-  output.url  % urlbst
+  format.note output
+  output.web.refs  % urlbst
   fin.entry
 }
 
@@ -1635,11 +1749,11 @@ FUNCTION {dictionary}
   format.date "year" output.check
   format.btitle "title" output.check
   add.semicolon
-%  add.blank
+  add.blank
   format.pages "pages" output.check
   new.block
-%  format.note output
-  output.url  % urlbst
+  format.note output
+  output.web.refs  % urlbst
   fin.entry
 }
 
@@ -1657,11 +1771,11 @@ FUNCTION {inbook}
   format.publisher.address output
   format.date "year" output.check
   date.block
-%  add.blank
+  add.blank
   format.pages "pages" output.check
   new.block
-%  format.note output
-  output.url  % urlbst
+  format.note output
+  output.web.refs  % urlbst
   fin.entry
 }
 
@@ -1679,11 +1793,11 @@ FUNCTION {incollection}
   format.publisher.address output
   format.date "year" output.check
   date.block
-%  add.blank
+  add.blank
   format.pages "pages" output.check
   new.block
-%  format.note output
-  output.url  % urlbst
+  format.note output
+  output.web.refs  % urlbst
   fin.entry
 }
 
@@ -1705,11 +1819,11 @@ FUNCTION {inproceedings}
   if$
   format.date "year" output.check
   date.block
-%  add.blank
+  add.blank
   format.pages "pages" output.check
   new.block
-%  format.note output
-  output.url  % urlbst
+  format.note output
+  output.web.refs  % urlbst
   fin.entry
 }
 
@@ -1725,14 +1839,13 @@ FUNCTION {phdthesis}
   new.block
   format.btitle
   "title" output.check
-  format.type "type" bibinfo.check output
+  format.type "type" output.check
   new.block
-  school "school" bibinfo.warn output
-  address "address" bibinfo.check output
+  format.school.address output
   format.date "year" output.check
   new.block
-%  format.note output
-  output.url  % urlbst
+  format.note output
+  output.web.refs  % urlbst
   fin.entry
 }
 
@@ -1773,8 +1886,8 @@ FUNCTION {proceedings}
   if$
       format.date "year" output.check
   new.block
-%  format.note output
-  output.url  % urlbst
+  format.note output
+  output.web.refs  % urlbst
   fin.entry
 }
 
@@ -1789,8 +1902,8 @@ FUNCTION {techreport}
   format.date "year" output.check
   format.tr.number output.nonnull
   new.block
-%  format.note output
-  output.url  % urlbst
+  format.note output
+  output.web.refs  % urlbst
   fin.entry
 }
 
@@ -1800,13 +1913,13 @@ FUNCTION {map}
   new.block
   format.title
   "title" output.check
-  format.type "type"
+  format.type "type" output.check
   new.block
   format.publisher.address output
   format.date "year" output.check
   new.block
-%  format.note output
-  output.url  % urlbst
+  format.note output
+  output.web.refs  % urlbst
   fin.entry
 }
 
@@ -1823,8 +1936,8 @@ FUNCTION {patent}
   format.tr.number output.nonnull
   format.date "year" output.check
   new.block
-%  format.note output
-  output.url  % urlbst
+  format.note output
+  output.web.refs  % urlbst
   fin.entry
 }
 
@@ -1835,8 +1948,8 @@ FUNCTION {unpublished}
   format.title "title" output.check
   format.date output
   new.block
-%  format.note "note" output.check
-  output.url  % urlbst
+  format.note "note" output.check
+  output.web.refs  % urlbst
   fin.entry
 }
 
@@ -1880,4 +1993,4 @@ FUNCTION {end.bib}
 EXECUTE {end.bib}
 %% End of customized bst file
 %%
-%% End of file `vancouver.bst'.
+%% End of file `plos2025.bst'.
