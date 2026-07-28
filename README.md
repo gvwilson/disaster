@@ -1,1 +1,1 @@
-# Quick Tips for Managing IT Disasters in Small Software Teams
+# Ten Quick Tips for Managing IT Disasters in Small Research Teams
