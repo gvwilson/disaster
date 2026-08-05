@@ -66,21 +66,20 @@ collaborators and deposited in repositories.  Scenarios include:
 \item Your data repository announces it is shutting down.
 \end{itemize}
 
-\item[Managing a physical laboratory and/or field staff]
+\item[Managing a physical laboratory]
 This category includes teams working in wet labs, field stations, or with
 sample collections.  Scenarios include:
 \begin{itemize}
-\item A freezer fails over a long weekend.
-\item A field researcher is injured and cannot complete data collection.
-\item A key piece of equipment is discontinued and can no longer be serviced.
+\item A specimen freezer fails over a long weekend.
+\item A key piece of equipment is out of warranty and can no longer be serviced.
+\item The notebook containing the labeling key for a set of specimens is lost.
 \end{itemize}
 
 \end{description}
 
-To make the advice concrete, we will use a running example: a five-person
-ecology lab that publishes an R package, runs a Shiny dashboard for
-collaborators, manages a ten-year field dataset, and maintains a wet lab
-with freezers and sample collections.
+These categories overlap: for example, a five-person ecology lab may publish an
+R package, run a Shiny dashboard for collaborators, manage a ten-year field
+dataset, and maintain a wet lab with freezers and sample collections.
 
 \begin{notebox}
 
@@ -93,30 +92,6 @@ for; they can often provide it.
 \end{notebox}
 
 \section*{Tip 1: Know your risks.}
-
-For a small research group, the most likely disasters span four domains:
-
-\begin{itemize}
-
-\item
-  Software packages: a registry token expires and the person who created it has
-  left; your source-code forge suspends your account.
-
-\item
-  Online services: your cloud provider suspends your account; the graduate
-  student who deployed the dashboard leaves and no one else has credentials; an
-  external service your app depends on shuts down.
-
-\item
-  Data: a lab server's hard drive fails; a field laptop is stolen; your data
-  repository announces it is shutting down.
-
-\item
-  Physical lab and field work: a freezer fails over a long weekend; a field
-  researcher is injured and cannot complete data collection; a key piece of
-  equipment is discontinued.
-
-\end{itemize}
 
 Start by making a point-form list of every service and physical asset your
 team depends on. For our ecology lab, this includes: where the R package is
@@ -162,24 +137,21 @@ everyone has read the plan, understands the criteria, and knows their first
 action if a disaster is declared.
 
 Your plan should include a short checklist for each scenario, written as a
-numbered series of specific actions. For example:
+numbered series of specific actions. For example, for an online service outage:
 
-\begin{itemize}
-\item
-  For an online service outage:
-  \begin{enumerate}
-  \item Send a message to the Signal ghttps://signal.org/.
-  \item Log into the database management console and click ``Restore from snapshot''.
-  \item Check that the dashboard loads and returns data correctly.
-  \end{enumerate}
-\item
-  For a freezer failure:
-  \begin{enumerate}
-  \item Call the lab manager at the emergency number on the printed contact sheet.
-  \item Move samples to the backup freezer in Building C, Room 112.
-  \item Log the time, temperature, and which samples were moved in the lab notebook.
-  \end{enumerate}
-\end{itemize}
+\begin{enumerate}
+\item Send a message to the Signal ghttps://signal.org/.
+\item Log into the database management console and click ``Restore from snapshot''.
+\item Check that the dashboard loads and returns data correctly.
+\end{enumerate}
+
+For a freezer failure:
+
+\begin{enumerate}
+\item Call the lab manager at the emergency number on the printed contact sheet.
+\item Move samples to the backup freezer in Building C, Room 112.
+\item Log the time, temperature, and which samples were moved in the lab notebook.
+\end{enumerate}
 
 \begin{notebox}
 
@@ -297,13 +269,13 @@ a.m. and no one was in the building''. Pick the thing that scares you most. Walk
 through the checklist step by step and fix anything that is missing, wrong, or
 stale then and there.
 
-Over the course of a year, aim to test one scenario from each domain:
+Over the course of a year, aim to test one scenario from each applicable domain:
 
 \begin{itemize}
 \item Restore the database from a snapshot.
-\item Release your software package from the mirrored repository.
+\item Release your software package from the mirrored repository (not the usual one).
 \item Download and verify your dataset from its repository deposit.
-\item Walk through a freezer-failure or field-evacuation drill.
+\item Walk through a freezer-failure drill.
 \end{itemize}
 
 Keep track of how long tests take and compare against your RTO. If restoring the
@@ -411,9 +383,16 @@ messages from Tip 4, and everyone else does what the leads tell them to.
 
 Create an incident log \emph{as you work}: a shared Google Doc or a thread in
 your out-of-band Signal group is good enough. Timestamp every significant
-action: ``14:32: freezer alarm triggered'', ``14:35: temperature reading -50°C
-and rising'', ``14:40: began sample transfer to Building C''. The log keeps the
-team in sync and gives you a record for the post-incident review.
+action:
+
+\begin{itemize}
+\item  14:32: freezer alarm triggered
+\item 14:35: temperature reading -50°C and rising
+\item 14:40: began sample transfer to Building C
+\end{itemize}
+
+The log keeps the team in sync and gives you a record for the post-incident
+review.
 
 Escalate early. If you are on a cloud provider's support plan, open a ticket the
 moment you suspect the problem is on their side. If the freezer repair
@@ -437,12 +416,15 @@ have costs. Identify them all:
 \item
   Digital costs: cloud backup storage, password-manager subscription, domain and
   certificate renewals, managed-database fees, repository deposit charges.
+
 \item
   Physical costs: backup freezer space, equipment maintenance contracts, UPS
   battery replacements, field-safety gear, sample-replacement materials.
+
 \item
-  Software costs: registry fees (if any), cloud-platform subscriptions,
-  monitoring-service fees.
+  Personnel costs: time spent on quarterly plan reviews, annual backup-restore
+  tests and disaster drills, cross-training to reduce lottery factors, and the
+  hours lost to incident response instead of research.
 \end{itemize}
 
 Calculate what a day of downtime costs you in concrete terms: lost experiment
@@ -451,7 +433,7 @@ deadline, or samples that cannot be replaced. For a grant-funded research group,
 "cost" also includes the graduate student who cannot finish their thesis chapter
 and the field season that cannot be re-run. That number tells you whether it is
 worth spending \$50/month on a managed database or \$200/year on a backup
-service. For most groups, it is.
+service.  For most groups, it is.
 
 \nocite{*}
 \bibliography{disaster-tips}
